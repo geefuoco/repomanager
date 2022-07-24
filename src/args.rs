@@ -14,6 +14,8 @@ pub enum Action {
     Create(CreateInfo),
     ///Delete a repo
     Delete(DeleteInfo),
+    ///Update a repo 
+    Update(UpdateInfo)
 }
 
 #[derive(Debug, Args)]
@@ -29,4 +31,14 @@ pub struct CreateInfo{
 pub struct DeleteInfo {
     ///The name of the repository to delete
     pub name: String
+}
+
+
+#[derive(Debug, Args)]
+pub struct UpdateInfo {
+    ///The name of the repo
+    pub name: String,
+    ///Privacy of the repo. Defaults to false
+    pub private: bool
+
 }
