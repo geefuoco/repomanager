@@ -80,7 +80,6 @@ fn delete_remote_repository(user_info: &Account, repo_name: &str) -> Result<(Str
     let auth = format!("token {}", user_info.password());
     let user_agent = "repomaker/0.1.0";
     let client = reqwest::blocking::Client::new();
-    println!("{}", &api_endpoint);
     let res = client.delete(api_endpoint)
         .header(reqwest::header::ACCEPT, header)
         .header(reqwest::header::AUTHORIZATION, auth)
