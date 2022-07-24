@@ -4,7 +4,7 @@ mod actions;
 mod args;
 
 use args::{RepoManager, Action};
-use actions::create_repository;
+use actions::{create_repository, delete_repository};
 use clap::Parser;
 
 fn main() {
@@ -13,7 +13,7 @@ fn main() {
 
     match &args.action {
         Action::Create(info) => create_repository(&info.name, &info.private),
-        _ => println!("Action not yet implemented")
+        Action::Delete(info) => delete_repository(&info.name),
     }
 
 }

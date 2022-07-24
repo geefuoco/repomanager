@@ -11,16 +11,22 @@ pub struct RepoManager {
 #[derive(Debug, Subcommand)]
 pub enum Action {
     ///Create a new repo 
-    Create(RepoInfo),
+    Create(CreateInfo),
     ///Delete a repo
-    Delete(RepoInfo),
+    Delete(DeleteInfo),
 }
 
 #[derive(Debug, Args)]
-pub struct RepoInfo{
-    ///The name of the repository to create
+pub struct CreateInfo{
+    ///The name of the repository to create 
     pub name: String,
     #[clap(short, long, action)]
     ///The privacy of the repo. Defaults to public
     pub private: bool
+}
+
+#[derive(Debug, Args)]
+pub struct DeleteInfo {
+    ///The name of the repository to delete
+    pub name: String
 }

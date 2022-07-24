@@ -29,15 +29,21 @@ pub fn create_repository(repo: &str, private: &bool) {
                             .arg(format!("git remote add origin git@github.com:{}/{}.git", &info.user(), &repo))
                             .output()
                             .expect("An error occured while trying to push to github.");
+                    println!("Successfully added repo");
                 },
                 _ => ()
             }
-            println!("Successfully added repo");
         } else {
             println!("Not currently in a git repository.")
         }
         format!("Finished. View at https://github.com/{}/{}", &info.user(), &repo);
     }
+}
+
+pub fn delete_repository(repo: &str) {
+    let info = get_github_info().unwrap();
+    let (result, _) = delete_remote_repository(&info, repo).unwrap();
+    println!("{}", result);
 }
 
 fn create_remote_repository(user_info: &Account, repo_name: &str, private: &bool) -> Result<(String, bool), Box<dyn Error>> {
@@ -66,4 +72,26 @@ fn create_remote_repository(user_info: &Account, repo_name: &str, private: &bool
         StatusCode::UNAUTHORIZED => Ok((String::from("Error: Please make sure your credentials are correct."), false)),
         _ => Ok((String::from("An unknown error has occured."), false))
     }
+}
+
+fn delete_remote_repository(user_info: &Account, repo_name: &str) -> Result<(String, bool), Box<dyn Error>> {
+    let api_endpoint = format!("https://api.github.com/repos/{}/{}", user_info.user(), repo_name);
+    let header = "application/vnd.github+json";
+    let auth = format!("token {}", user_info.password());
+    let user_agent = "repomaker/0.1.0";
+    let client = reqwest::blocking::Client::new();
+    println!("{}", &api_endpoint);
+    let res = client.delete(api_endpoint)
+        .header(reqwest::header::ACCEPT, header)
+        .header(reqwest::header::AUTHORIZATION, auth)
+        .header(reqwest::header::USER_AGENT, user_agent)
+        .send()?;
+    match res.status() {
+        StatusCode::NO_CONTENT => Ok((String::from("Repository has been successfully deleted."), true)),
+        StatusCode::NOT_FOUND => Ok((String::from("Could not find the provided repo"), false)),
+        StatusCode::FORBIDDEN=> Ok((String::from("Not authorized to delete this repo"), false)),
+        _ => Ok((String::from("An unknown error has occured"), false))
+
+    }
+
 }
