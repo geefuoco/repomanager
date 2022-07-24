@@ -13,13 +13,17 @@ The tool expects a a file at `~/.repomanager/.github_info.txt`. The first line s
 
 Your personal access token needs to have permission to delete repositories.
 
+___
+### Install
+
+Clone the repo and run `cargo build --release`. The script will be in the `target/release`directory with the name `repomanager`
+
+
 ##### Optional
-Move into your binary path to call from anywhere 
+Move into your binary path to call the script from anywhere 
 ```
 sudo cp repomanager /bin/repomanager
 ```
-
-
 ___
 
 #### Create a repo

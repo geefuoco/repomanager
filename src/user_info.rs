@@ -28,7 +28,7 @@ impl fmt::Display for Account {
 
 pub fn get_github_info() -> Result<Account, Box<dyn Error>> {
     let home = env::var("HOME").unwrap();
-    let path = format!("{}/.repomaker/.github_info.txt", home);
+    let path = format!("{}/.repomanager/.github_info.txt", home);
     let file = File::open(path)?;
     let mut reader = BufReader::new(file);
     let mut result = String::new();
