@@ -1,9 +1,46 @@
-use crate::user_info::Account;
+use crate::user_info::{Account, get_github_info};
+use crate::input::read_input;
+use std::path::Path;
 use std::collections::HashMap;
 use reqwest::{self, StatusCode};
 use std::error::Error;
+use std::process::Command;
 
-pub fn create_repository(user_info: &Account, repo_name: &str, private: bool) -> Result<(String, bool), Box<dyn Error>> {
+
+pub fn create_repository(repo: &str, private: &bool) {
+    println!("Creating repository: {}", &repo);
+    let info = get_github_info().unwrap();
+    let (result, success) = create_remote_repository(&info, &repo, private).unwrap();
+    println!("{}", result);
+    if success {
+        let git = Path::new("./.git").is_dir();
+        if git {
+            println!("Would you like to connect your current folder to the new repo ? [y/n]");
+            let answer = loop {
+                let input = read_input().unwrap().trim().to_lowercase().to_owned();
+                if input == "n" || input == "y" {
+                    break input;
+                }
+            };
+            match answer.as_str() {
+                "y" => {
+                    Command::new("/bin/bash")
+                            .arg("-c")
+                            .arg(format!("git remote add origin git@github.com:{}/{}.git", &info.user(), &repo))
+                            .output()
+                            .expect("An error occured while trying to push to github.");
+                },
+                _ => ()
+            }
+            println!("Successfully added repo");
+        } else {
+            println!("Not currently in a git repository.")
+        }
+        format!("Finished. View at https://github.com/{}/{}", &info.user(), &repo);
+    }
+}
+
+fn create_remote_repository(user_info: &Account, repo_name: &str, private: &bool) -> Result<(String, bool), Box<dyn Error>> {
     let api_endpoint = "https://api.github.com/user/repos";
     let header = "application/vnd.github+json";
     let user_agent = "repomaker/0.1.0";
