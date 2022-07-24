@@ -38,7 +38,7 @@ pub struct DeleteInfo {
 pub struct UpdateInfo {
     ///The name of the repo
     pub name: String,
-    ///Privacy of the repo. Defaults to false
-    pub private: bool
+    ///Privacy of the repo. Can be public, or private
+    pub visibility: String
 
 }

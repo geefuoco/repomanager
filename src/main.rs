@@ -14,7 +14,7 @@ fn main() {
     match &args.action {
         Action::Create(info) => create_repository(&info.name, &info.private),
         Action::Delete(info) => delete_repository(&info.name),
-        Action::Update(info) => update_repository(&info.name, &info.private),
+        Action::Update(info) => update_repository(&info.name, &info.visibility),
     }
 
 }

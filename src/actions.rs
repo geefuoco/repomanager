@@ -95,24 +95,20 @@ fn delete_remote_repository(user_info: &Account, repo_name: &str) -> Result<(Str
 
 }
 
-pub fn update_repository(repo: &str, private: &bool) {
+pub fn update_repository(repo: &str, visibility: &str) {
     let info = get_github_info().unwrap();
-    let (result, _) = update_remote_repository(&info, repo, private).unwrap();
+    let (result, _) = update_remote_repository(&info, repo, visibility).unwrap();
     println!("{}", result)
 }
 
-fn update_remote_repository(user_info: &Account, repo_name:  &str, private: &bool) -> Result<(String, bool), Box<dyn Error>> {
+fn update_remote_repository(user_info: &Account, repo_name:  &str, visibility: &str) -> Result<(String, bool), Box<dyn Error>> {
     let api_endpoint = format!("https://api.github.com/repos/{}/{}", user_info.user(), repo_name);
     let header = "application/vnd.github+json";
     let auth = format!("token {}", user_info.password());
     let user_agent = "repomaker/0.1.0";
     let mut data = HashMap::new();
     data.insert("name", repo_name);
-    match private {
-        true => data.insert("private", "true"),
-        _ => data.insert("private", "false")
-
-    };
+    data.insert("visibility", visibility);
     let client = reqwest::blocking::Client::new();
     let res = client.patch(api_endpoint)
         .json(&data)
@@ -120,8 +116,9 @@ fn update_remote_repository(user_info: &Account, repo_name:  &str, private: &boo
         .header(reqwest::header::AUTHORIZATION, auth)
         .header(reqwest::header::USER_AGENT, user_agent)
         .send()?;
+    println!("{}", &res.status());
     match res.status() {
-        StatusCode::NO_CONTENT => Ok((String::from("Repository has been successfully updated."), true)),
+        StatusCode::OK=> Ok((String::from("Successfully updated the repository"), true)),
         StatusCode::NOT_FOUND => Ok((String::from("Could not find the provided repo"), false)),
         StatusCode::FORBIDDEN=> Ok((String::from("Not authorized to update this repo"), false)),
         _ => Ok((String::from("An unknown error has occured"), false))
